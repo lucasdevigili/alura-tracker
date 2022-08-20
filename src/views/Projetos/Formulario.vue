@@ -2,13 +2,8 @@
   <section>
     <form @submit.prevent="salvar">
       <div class="field">
-        <label for="nomeDoProjeto" class="label"> Nome do Projeto </label>
-        <input
-          type="text"
-          class="input"
-          v-model="nomeDoProjeto"
-          id="nomeDoProjet"
-        />
+        <label for="nomeDoProjeto" class="label">Nome do Projeto</label>
+        <input type="text" class="input" v-model="nomeDoProjeto" id="nomeDoProjet" />
       </div>
       <div class="field">
         <button class="button" type="submit">Salvar</button>
@@ -20,8 +15,8 @@
 <script lang="ts">
 import { useStore } from "@/store";
 import { defineComponent } from "vue";
-
-import { ALTERA_PROJETO, ADICIONA_PROJETO, NOTIFICAR } from '@/store/tipo-mutacoes'
+import { notificacaoMixin } from "@/mixins/notificar";
+import { ALTERA_PROJETO, ADICIONA_PROJETO } from "@/store/tipo-mutacoes";
 import { TipoNotificacao } from "../../interfaces/INotificacao";
 
 export default defineComponent({
@@ -31,10 +26,13 @@ export default defineComponent({
       type: String
     }
   },
-  mounted () {
-    if(this.id) {
-      const projeto = this.store.state.projetos.find(proj => proj.id == this.id)
-      this.nomeDoProjeto = projeto?.nome || ''
+  mixins: [notificacaoMixin],
+  mounted() {
+    if (this.id) {
+      const projeto = this.store.state.projetos.find(
+        proj => proj.id == this.id
+      );
+      this.nomeDoProjeto = projeto?.nome || "";
     }
   },
   data() {
@@ -48,24 +46,24 @@ export default defineComponent({
         this.store.commit(ALTERA_PROJETO, {
           id: this.id,
           nome: this.nomeDoProjeto
-        })
+        });
       } else {
-        this.store.commit(ADICIONA_PROJETO, this.nomeDoProjeto)
+        this.store.commit(ADICIONA_PROJETO, this.nomeDoProjeto);
       }
       this.nomeDoProjeto = "";
-      this.store.commit(NOTIFICAR, {
-        titulo: 'Novo projeto foi salvo',
-        texto:  ' Prontinho :) seu projeto já está disponível',
-        tipo: TipoNotificacao.SUCESSO
-      })
-      this.$router.push('/projetos')
-    },
+      this.notificar(
+        TipoNotificacao.ATENCAO,
+        "Exelente",
+        "O projeto foi cadastrado com seucesso"
+      );
+      this.$router.push("/projetos");
+    }
   },
-  setup () {
-    const store = useStore()
+  setup() {
+    const store = useStore();
     return {
       store
-    }
+    };
   }
 });
 </script>
